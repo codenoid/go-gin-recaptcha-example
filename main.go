@@ -3,7 +3,6 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/foolin/goview"
@@ -12,8 +11,7 @@ import (
 	"gopkg.in/ezzarghili/recaptcha-go.v4"
 )
 
-var _ = os.Setenv("RECAPTCHA_SECRET", "6LenMekbAAAAAIUbHoSiOmf1CkhECk75AcKUysRF")
-var recaptchaSecret = os.Getenv("RECAPTCHA_SECRET")
+var recaptchaSecret = "6LenMekbAAAAAIUbHoSiOmf1CkhECk75AcKUysRF"
 
 func main() {
 	r := gin.Default()
@@ -42,7 +40,7 @@ func main() {
 			return
 		}
 
-		c.HTML(http.StatusUnprocessableEntity, "home", gin.H{"name": c.PostForm("name")})
+		c.HTML(http.StatusOK, "home", gin.H{"name": c.PostForm("name")})
 	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
