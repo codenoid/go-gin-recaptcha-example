@@ -1,0 +1,28 @@
+{{ define "content" }}
+
+{{ if .name }}
+    <h1>{{ .name }}</h1>
+    <h3 style="color: green;">Successful request</h3>
+    <marquee>Successful request</marquee>
+{{ end }}
+
+{{ if .error }}
+    <h1>{{ .error }}</h1>
+    <h3 style="color: red;">Failed request</h3>
+{{ end }}
+
+<form method="post" id="greeting" action="/">
+    <input type="text" name="name" placeholder="Input your name" id="">
+    <br><br>
+    <button class="g-recaptcha btn btn-primary" 
+    data-sitekey="6LenMekbAAAAADf6J6wtEf8IICDvGUax1qR4Oukd"
+    data-callback="onGreetingSubmit"
+    data-action='submit'>KIRIM FORM</button>
+</form>
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+function onGreetingSubmit(token) {
+    document.getElementById("greeting").submit();
+}
+</script>
+{{ end }}
