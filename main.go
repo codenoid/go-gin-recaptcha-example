@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	ginrecaptcha "github.com/codenoid/gin-recaptcha"
 	"github.com/foolin/goview"
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
-	"gopkg.in/ezzarghili/recaptcha-go.v4"
 )
 
 var recaptchaSecret = "6LenMekbAAAAAIUbHoSiOmf1CkhECk75AcKUysRF"
@@ -23,23 +23,21 @@ func main() {
 		DisableCache: true,
 	})
 
+	secret := "6LenMekbAAAAAIUbHoSiOmf1CkhECk75AcKUysRF"
+	captcha, err := ginrecaptcha.InitRecaptchaV3(secret, 10*time.Second)
+	if err != nil {
+		panic(err)
+	}
+
+	captcha.SetErrResponse(func(c *gin.Context) {
+		c.String(http.StatusUnprocessableEntity, "captcha error")
+	})
+
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "home", gin.H{})
 	})
 
-	r.POST("/", func(c *gin.Context) {
-
-		captcha, err := recaptcha.NewReCAPTCHA(recaptchaSecret, recaptcha.V3, 10*time.Second) // for v3 API use https://g.co/recaptcha/v3 (apperently the same admin UI at the time of writing)
-		if err != nil {
-			c.HTML(http.StatusUnprocessableEntity, "home", gin.H{"error": err.Error()})
-			return
-		}
-
-		if err := captcha.Verify(c.PostForm("g-recaptcha-response")); err != nil {
-			c.HTML(http.StatusUnprocessableEntity, "home", gin.H{"error": err.Error()})
-			return
-		}
-
+	r.POST("/", captcha.UseCaptcha, func(c *gin.Context) {
 		c.HTML(http.StatusOK, "home", gin.H{"name": c.PostForm("name")})
 	})
 
